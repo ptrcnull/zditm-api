@@ -16,7 +16,7 @@ type ZditmResponse struct {
 func main() {
 	r := gin.Default()
 
-	r.GET("/:id", func(c *gin.Context) {
+	r.GET("/json/:id", func(c *gin.Context) {
 		id, _ := c.Params.Get("id")
 		html, err := MakeRequest(id)
 		if err != nil {
@@ -30,6 +30,26 @@ func main() {
 		c.JSON(200, body)
 		return
 	})
+
+        r.GET("/text/:id", func(c *gin.Context) {
+                id, _ := c.Params.Get("id")
+                html, err := MakeRequest(id)
+                if err != nil {
+                        c.AbortWithStatusJSON(500, err)
+                }
+
+                body, err := ParseHTML(html)
+                if err != nil {
+                        c.AbortWithStatusJSON(500, err)
+                }
+                var res string
+                for _, row := range body {
+                        res += row.Line + ": " + row.Direction + " " + row.Time + "\n"
+                }
+
+                c.String(200, res)
+                return
+        })
 
 	if err := r.Run(":38126"); err != nil {
 		panic(err)
