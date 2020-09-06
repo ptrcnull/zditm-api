@@ -34,6 +34,8 @@ const homepage = `<!DOCTYPE html>
 		GET /text/:id
 		<br />
 		Example: <a href="http://{host}/text/30311">http://{host}/text/30311</a>
+		<br />
+		Best used with a HTTP widget like <a href="https://apkpure.com/http-widget/com.axgs.httpwidget">this one</a>.
 	</p>
 	<p>
 		ID can be found at every stop next to the name

@@ -21,3 +21,5 @@ Response:
 ```
 ${line}: ${direction} ${time}
 ```
+
+Best used with a HTTP widget like [this one](https://apkpure.com/http-widget/com.axgs.httpwidget).
