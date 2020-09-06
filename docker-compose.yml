@@ -6,4 +6,6 @@ services:
     container_name: zditm-api
     restart: always
     ports:
-    - 38126:38126
+    - 127.0.0.1:38126:38126
+    environment:
+    - GIN_MODE=release

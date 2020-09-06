@@ -16,6 +16,37 @@ type ZditmResponse struct {
 func main() {
 	r := gin.Default()
 
+	r.GET("/", func(c *gin.Context) {
+		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(`<!DOCTYPE html>
+<head>
+	<title>zditm</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style>
+		body {
+			font-family: monospace;
+		}
+	</style>
+</head>
+<body>
+	<p>
+		GET /json/:id
+		<br />
+		Response:
+		<pre>
+		{
+			line: string
+			direction: string
+			time: string
+		}
+		</pre>
+	</p>
+	<p>
+		GET /text/:id
+	</p>
+</body>
+`))
+	})
+
 	r.GET("/json/:id", func(c *gin.Context) {
 		id, _ := c.Params.Get("id")
 		html, err := MakeRequest(id)
