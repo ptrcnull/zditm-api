@@ -6,18 +6,15 @@ import (
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 type ZditmResponse struct {
-	Tresc string
+	Tresc     string
 	Komunikat string
 }
 
-func main() {
-	r := gin.Default()
-
-	r.GET("/", func(c *gin.Context) {
-		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(`<!DOCTYPE html>
+const homepage = `<!DOCTYPE html>
 <head>
 	<title>zditm</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,20 +28,28 @@ func main() {
 	<p>
 		GET /json/:id
 		<br />
-		Response:
-		<pre>
-		{
-			line: string
-			direction: string
-			time: string
-		}
-		</pre>
+		Example: <a href="http://{host}/json/30311">http://{host}/json/30311</a>
 	</p>
 	<p>
 		GET /text/:id
+		<br />
+		Example: <a href="http://{host}/text/30311">http://{host}/text/30311</a>
+	</p>
+	<p>
+		ID can be found at every stop next to the name
+		or online at <a href="https://www.zditm.szczecin.pl/pl/mapy/przystanki-i-pojazdy">https://www.zditm.szczecin.pl/pl/mapy/przystanki-i-pojazdy</a>.
 	</p>
 </body>
-`))
+`
+
+func main() {
+	r := gin.Default()
+
+	r.GET("/", func(c *gin.Context) {
+		host := c.Request.Host
+		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(
+			strings.ReplaceAll(homepage, "{host}", host),
+		))
 	})
 
 	r.GET("/json/:id", func(c *gin.Context) {
@@ -62,25 +67,25 @@ func main() {
 		return
 	})
 
-        r.GET("/text/:id", func(c *gin.Context) {
-                id, _ := c.Params.Get("id")
-                html, err := MakeRequest(id)
-                if err != nil {
-                        c.AbortWithStatusJSON(500, err)
-                }
+	r.GET("/text/:id", func(c *gin.Context) {
+		id, _ := c.Params.Get("id")
+		html, err := MakeRequest(id)
+		if err != nil {
+			c.AbortWithStatusJSON(500, err)
+		}
 
-                body, err := ParseHTML(html)
-                if err != nil {
-                        c.AbortWithStatusJSON(500, err)
-                }
-                var res string
-                for _, row := range body {
-                        res += row.Line + ": " + row.Direction + " " + row.Time + "\n"
-                }
+		body, err := ParseHTML(html)
+		if err != nil {
+			c.AbortWithStatusJSON(500, err)
+		}
+		var res string
+		for _, row := range body {
+			res += row.Line + ": " + row.Direction + " " + row.Time + "\n"
+		}
 
-                c.String(200, res)
-                return
-        })
+		c.String(200, res)
+		return
+	})
 
 	if err := r.Run(":38126"); err != nil {
 		panic(err)
@@ -105,4 +110,3 @@ func MakeRequest(id string) (string, error) {
 
 	return res.Tresc, nil
 }
-
